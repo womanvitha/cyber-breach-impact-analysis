@@ -4,7 +4,7 @@ Analyzing 850 real-world cybersecurity incidents (2021–2025) to understand wha
 
 ## The Question
 
-When a company suffers a cyberattack, what predicts how expensive it is — and does the market actually react?
+When a company suffers a cyberattack, what predicts how expensive it is and does the market actually react?
 
 ## Data
 
@@ -15,8 +15,8 @@ Sourced from Kaggle: [Cybersecurity Breach Impact Dataset](https://www.kaggle.co
 
 ## Key Findings
 
-**1. Breach cost varies significantly by industry — but sample size matters.**
-Public Administration/Government and Transportation/Warehousing see the highest average losses among industries with reliable sample sizes (n ≥ 10). Notably, frequently-discussed sectors like Healthcare and Finance rank mid-pack once small-sample noise is filtered out — frequency of breaches and severity of cost are not the same thing.
+**1. Breach cost varies significantly by industry but sample size matters.**
+Public Administration/Government and Transportation/Warehousing see the highest average losses among industries with reliable sample sizes (n ≥ 10). Notably, frequently-discussed sectors like Healthcare and Finance rank mid-pack once small-sample noise is filtered out, frequency of breaches and severity of cost are not the same thing.
 
 ![Industry costs](visuals/avg_loss_by_industry.png)
 
@@ -25,13 +25,13 @@ Phishing incidents nearly doubled from 2024 to 2025 (27 → 51), and APT (advanc
 
 ![Attack vector trends](visuals/attack_vector_trends.png)
 
-**3. The stock market reacts negatively almost every time — but the effect is often small.**
+**3. The stock market reacts negatively almost every time but the effect is often small.**
 Nearly the entire distribution of 1-day abnormal stock returns after breach disclosure sits below zero (mean: -3.4%), but only 18.4% of these reactions were statistically significant. This suggests breaches consistently hurt stock price on average, but for many companies the effect is within normal day-to-day volatility rather than a dramatic, unambiguous market punishment.
 
 ![Market reaction](visuals/market_reaction_distribution.png)
 
-**4. Company size — not industry or attack type — is the strongest predictor of breach cost.**
-A random forest model predicting whether a breach results in above-median financial loss achieved 65% accuracy (vs. a 50% random baseline). Company revenue and employee count were by far the most important features, together accounting for roughly half the model's decisions. Being a publicly traded company barely mattered for predicting cost — it affects whether markets react, but not how expensive the breach itself is.
+**4. Company size ,not industry or attack type, is the strongest predictor of breach cost.**
+A random forest model predicting whether a breach results in above-median financial loss achieved 65% accuracy (vs. a 50% random baseline). Company revenue and employee count were by far the most important features, together accounting for roughly half the model's decisions. Being a publicly traded company barely mattered for predicting cost, it affects whether markets react, but not how expensive the breach itself is.
 
 ![Feature importance](visuals/feature_importance.png)
 
@@ -39,10 +39,49 @@ A random forest model predicting whether a breach results in above-median financ
 
 - **Accuracy:** 65% (baseline: 50%)
 - **Class recall:** 74% for low-loss incidents, 55% for high-loss incidents
-- The model catches low-cost breaches more reliably than high-cost ones, suggesting company/attack metadata alone captures some — but not most — of what drives breach severity. Likely missing factors: incident response quality, legal negotiation outcomes, and jurisdiction-specific regulatory exposure, none of which are present in this dataset.
+- The model catches low-cost breaches more reliably than high-cost ones, suggesting company/attack metadata alone captures some, but not most of what drives breach severity. Likely missing factors: incident response quality, legal negotiation outcomes, and jurisdiction-specific regulatory exposure, none of which are present in this dataset.
 
 ## Tech Stack
 
 Python · pandas · scikit-learn · matplotlib · seaborn
 
 ## Project Structure
+
+```
+├── data/
+│   ├── raw/          # original Kaggle CSVs
+│   └── processed/    # cleaned, merged dataset
+├── notebooks/         # exploratory analysis
+├── src/
+│   ├── clean_data.py     # data cleaning & merging pipeline
+│   ├── analysis.py       # industry/trend/model analysis functions
+│   ├── visualize.py      # chart generation
+│   └── run_pipeline.py   # runs everything end-to-end
+├── visuals/           # exported chart images
+└── requirements.txt
+```
+
+## How to Run
+
+```bash
+git clone https://github.com/womanvitha/cyber-breach-impact-analysis.git
+cd cyber-breach-impact-analysis
+python -m venv venv
+venv\Scripts\Activate.ps1      # Windows
+pip install -r requirements.txt
+python src/run_pipeline.py
+```
+
+This regenerates the cleaned dataset, all charts, and the trained model from the raw data in one command.
+
+## Limitations
+
+- Breach cost and market reaction data isn't available for all incidents (particularly private companies, which don't have stock market data). This is a structural gap in the data, not a data quality issue.
+- The dataset's most recent year (2025) may be under-represented, since breach discovery and disclosure often lag the actual incident by months.
+- The model's moderate accuracy (65%) reflects genuine limits of predicting financial outcomes from company/attack metadata alone, factors like incident response quality and legal outcomes aren't captured here.
+
+## Future Work
+
+- Incorporate attack sophistication/tooling data to test the hypothesis that AI-assisted phishing is driving the 2025 spike, rather than inferring it indirectly
+- Explore regression (predicting exact loss amount) rather than binary classification
+- Add regulatory jurisdiction as a feature, since fines vary significantly by region (e.g. GDPR vs. US state laws)
